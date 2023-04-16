@@ -1,5 +1,7 @@
 server:
   port: 8080
+  rate_limit: 2
+  retry_after: 2
 
 auth:
   auth_mode: "basic"
