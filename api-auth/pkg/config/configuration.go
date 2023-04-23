@@ -12,5 +12,5 @@ type Server struct {
 }
 
 type Auth struct {
-	AuthMode string `yaml:"auth_mode"`
+	Mode string `yaml:"mode"`
 }

@@ -4,4 +4,4 @@ server:
   retry_after: 2
 
 auth:
-  auth_mode: "basic"
+  mode: "basic"
