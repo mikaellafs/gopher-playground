@@ -1,8 +1,8 @@
-package auth
+package mode
 
 import (
 	"errors"
-	"gopher-playground/api-auth/pkg/user"
+	"gopher-playground/api-auth/pkg/auth/user"
 )
 
 var (
@@ -11,5 +11,5 @@ var (
 )
 
 type AuthMode interface {
-	Authenticate(authHeader string, userRepo user.Repository) (string, error)
+	Authenticate(authHeader string, userRepo user.Repository) (*user.User, error)
 }
