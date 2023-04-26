@@ -24,6 +24,7 @@ func (m *Authentication) Middleware(c *gin.Context) {
 	authH := c.GetHeader("Authorization")
 	if authH == "" {
 		c.Next()
+		return
 	}
 
 	user, err := m.mode.Authenticate(authH, m.repo)
