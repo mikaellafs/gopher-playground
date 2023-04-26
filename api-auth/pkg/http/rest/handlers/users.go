@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"gopher-playground/api-auth/pkg/auth"
 	"gopher-playground/api-auth/pkg/auth/user"
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,7 @@ func NewUserHandler(r user.Repository) *UserHandler {
 }
 
 type criarUsuarioBody struct {
+	Name     string `json:"name" binding:"required"`
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
@@ -33,9 +35,15 @@ func (h *UserHandler) CriarUsuario(c *gin.Context) {
 	}
 
 	// Create user
-	_, err := h.repo.CreateUser(context.TODO(), body.Username, body.Password)
+	hashedPassword, err := auth.Encrypt(body.Password)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Failed to encrypt password:"+err.Error())
+	}
+
+	_, err = h.repo.CreateUser(context.TODO(), body.Username, hashedPassword, body.Name)
 	if err != nil {
 		c.String(httpStatusFor(err), err.Error())
+		return
 	}
 
 	c.Status(http.StatusCreated)

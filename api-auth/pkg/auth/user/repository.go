@@ -11,7 +11,7 @@ var (
 )
 
 type Repository interface {
-	CreateUser(ctx context.Context, username, password string) (*User, error)
+	CreateUser(ctx context.Context, username, password, name string) (*User, error)
 	ReadUser(ctx context.Context, username string) (*User, error)
 	DeleteUser(ctx context.Context, username string) error
 }

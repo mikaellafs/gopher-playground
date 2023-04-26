@@ -8,6 +8,7 @@ import (
 )
 
 type memoryUser struct {
+	name     string
 	username string
 	pwHash   string
 }
@@ -26,7 +27,7 @@ func NewMemoryUserRepository() *MemoryUserRepository {
 	}
 }
 
-func (r *MemoryUserRepository) CreateUser(ctx context.Context, username, password string) (*user.User, error) {
+func (r *MemoryUserRepository) CreateUser(ctx context.Context, username, password, name string) (*user.User, error) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 
@@ -36,11 +37,13 @@ func (r *MemoryUserRepository) CreateUser(ctx context.Context, username, passwor
 	}
 
 	r.users[username] = &memoryUser{
+		name:     name,
 		username: username,
 		pwHash:   password,
 	}
 
 	return &user.User{
+		Name:     name,
 		Username: username,
 		Password: password,
 	}, nil
@@ -52,6 +55,7 @@ func (r *MemoryUserRepository) ReadUser(ctx context.Context, username string) (*
 	}
 
 	return &user.User{
+		Name:     r.users[username].name,
 		Username: username,
 		Password: r.users[username].pwHash,
 	}, nil
