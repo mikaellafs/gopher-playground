@@ -46,6 +46,7 @@ func Initialize(cfg *Config) *gin.Engine {
 	rg.Use(middlewares.NewAuthenticator(cfg.AuthMode, cfg.UserRepo).Middleware)
 
 	setUserRoutes(rg, cfg.UserRepo)
+	setHelloRoutes(rg)
 
 	return r
 }
