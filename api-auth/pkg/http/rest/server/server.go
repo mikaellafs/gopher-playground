@@ -32,6 +32,13 @@ func Start(cfg *config.Configuration) error {
 	r := router.Initialize(rcfg)
 
 	// Start server
-	log.Println("Listening on port", cfg.Server.Port)
-	return r.Run(":" + cfg.Server.Port)
+	addr := ":" + cfg.Server.Port
+
+	if cfg.Server.Https.Enable {
+		log.Println("Listening HTTPS on", addr)
+		return r.RunTLS(addr, cfg.Server.Https.CertPath, cfg.Server.Https.KeyPath)
+	}
+
+	log.Println("Listening HTTP on", addr)
+	return r.Run(addr)
 }

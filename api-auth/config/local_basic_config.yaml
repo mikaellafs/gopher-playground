@@ -3,5 +3,10 @@ server:
   rate_limit: 2
   retry_after: 2
 
+  https:
+    enable: true
+    cert_path: "certs/server/server.crt"
+    key_path: "certs/server/server.key"
+
 auth:
   mode: "basic"
