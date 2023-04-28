@@ -4,7 +4,7 @@ server:
   retry_after: 2
 
   https:
-    enable: true
+    enable: false
     cert_path: "certs/server/server.crt"
     key_path: "certs/server/server.key"
 

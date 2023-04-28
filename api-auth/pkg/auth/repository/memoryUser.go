@@ -50,6 +50,9 @@ func (r *MemoryUserRepository) CreateUser(ctx context.Context, username, passwor
 }
 
 func (r *MemoryUserRepository) ReadUser(ctx context.Context, username string) (*user.User, error) {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+
 	if r.users[username] == nil {
 		return nil, user.ErrUserNotFound
 	}
