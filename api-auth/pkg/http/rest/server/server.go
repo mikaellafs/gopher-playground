@@ -4,14 +4,16 @@ import (
 	"log"
 
 	authmode "gopher-playground/api-auth/pkg/auth/mode"
-	"gopher-playground/api-auth/pkg/auth/repository"
+	userrepo "gopher-playground/api-auth/pkg/auth/repository"
 	"gopher-playground/api-auth/pkg/config"
 	"gopher-playground/api-auth/pkg/http/rest/router"
+	logrepo "gopher-playground/api-auth/pkg/log/repository"
 )
 
 func Start(cfg *config.Configuration) error {
 	// Create repos
-	userRepo := repository.NewMemoryUserRepository()
+	userRepo := userrepo.NewMemoryUserRepository()
+	logRepo := logrepo.NewMemoryAuditLogRepository()
 
 	// Get auth mode
 	mode, err := authmode.Get(cfg.Auth.Mode)
@@ -25,6 +27,7 @@ func Start(cfg *config.Configuration) error {
 		RetryAfter: cfg.Server.RetryAfter,
 
 		UserRepo: userRepo,
+		LogRepo:  logRepo,
 
 		AuthMode: mode,
 	}

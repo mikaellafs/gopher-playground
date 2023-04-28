@@ -7,6 +7,7 @@ import (
 	authmode "gopher-playground/api-auth/pkg/auth/mode"
 	"gopher-playground/api-auth/pkg/auth/user"
 	"gopher-playground/api-auth/pkg/http/rest/middlewares"
+	"gopher-playground/api-auth/pkg/log"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,7 @@ type Config struct {
 	AuthMode authmode.AuthMode
 
 	UserRepo user.Repository
+	LogRepo  log.Repository
 }
 
 func Initialize(cfg *Config) *gin.Engine {
@@ -44,6 +46,13 @@ func Initialize(cfg *Config) *gin.Engine {
 
 	rg.Use(middlewares.NewRateLimiting(cfg.RateLimit, cfg.RetryAfter).Middleware)
 	rg.Use(middlewares.NewAuthenticator(cfg.AuthMode, cfg.UserRepo).Middleware)
+
+	logMiddleware := middlewares.NewAuditLog(cfg.LogRepo)
+	rg.Use(logMiddleware.StartMiddleware)
+	rg.Use(func(c *gin.Context) {
+		c.Next()
+		logMiddleware.EndMiddleware(c)
+	})
 
 	setUserRoutes(rg, cfg.UserRepo)
 	setHelloRoutes(rg)
