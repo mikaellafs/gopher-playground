@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+
 	"gopher-playground/api-auth/pkg/auth/user"
 
 	"github.com/gin-gonic/gin"

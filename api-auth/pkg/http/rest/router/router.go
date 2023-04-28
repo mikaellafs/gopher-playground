@@ -56,6 +56,7 @@ func Initialize(cfg *Config) *gin.Engine {
 
 	setUserRoutes(rg, cfg.UserRepo)
 	setHelloRoutes(rg)
+	setLogsRoute(rg, cfg.LogRepo)
 
 	return r
 }
