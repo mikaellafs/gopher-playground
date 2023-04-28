@@ -13,6 +13,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type middleware func(c *gin.Context)
+
 type Config struct {
 	RateLimit  int
 	RetryAfter float64
@@ -44,15 +46,7 @@ func Initialize(cfg *Config) *gin.Engine {
 
 	rg.GET("/", healthCheck)
 
-	rg.Use(middlewares.NewRateLimiting(cfg.RateLimit, cfg.RetryAfter).Middleware)
-	rg.Use(middlewares.NewAuthenticator(cfg.AuthMode, cfg.UserRepo).Middleware)
-
-	logMiddleware := middlewares.NewAuditLog(cfg.LogRepo)
-	rg.Use(logMiddleware.StartMiddleware)
-	rg.Use(func(c *gin.Context) {
-		c.Next()
-		logMiddleware.EndMiddleware(c)
-	})
+	setMiddlewares(rg, cfg)
 
 	setUserRoutes(rg, cfg.UserRepo)
 	setHelloRoutes(rg)
@@ -63,4 +57,23 @@ func Initialize(cfg *Config) *gin.Engine {
 
 func healthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, "OK")
+}
+
+func setMiddlewares(rg *gin.RouterGroup, cfg *Config) {
+	rg.Use(middlewares.NewRateLimiting(cfg.RateLimit, cfg.RetryAfter).Middleware)
+	rg.Use(middlewares.NewAuthenticator(cfg.AuthMode, cfg.UserRepo).Middleware)
+
+	logMiddleware := middlewares.NewAuditLog(cfg.LogRepo)
+	rg.Use(logMiddleware.StartMiddleware)
+
+	setPostMiddleware(rg, logMiddleware.EndMiddleware)
+}
+
+// Middleware that need to be execute after handler
+func setPostMiddleware(rg *gin.RouterGroup, m middleware) {
+	rg.Use(func(c *gin.Context) {
+		c.Next()
+
+		m(c)
+	})
 }
