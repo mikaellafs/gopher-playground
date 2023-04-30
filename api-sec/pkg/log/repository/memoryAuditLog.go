@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"gopher-playground/api-auth/pkg/log"
+	"gopher-playground/api-sec/pkg/log"
 )
 
 type auditLog struct {

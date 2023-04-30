@@ -2,7 +2,7 @@ package mode
 
 import (
 	"errors"
-	"gopher-playground/api-auth/pkg/auth/user"
+	"gopher-playground/api-sec/pkg/auth/user"
 )
 
 var (

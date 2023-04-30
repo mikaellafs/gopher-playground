@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	authmode "gopher-playground/api-auth/pkg/auth/mode"
-	"gopher-playground/api-auth/pkg/auth/user"
-	"gopher-playground/api-auth/pkg/http/rest/middlewares"
-	"gopher-playground/api-auth/pkg/log"
+	authmode "gopher-playground/api-sec/pkg/auth/mode"
+	"gopher-playground/api-sec/pkg/auth/user"
+	"gopher-playground/api-sec/pkg/http/rest/middlewares"
+	"gopher-playground/api-sec/pkg/log"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

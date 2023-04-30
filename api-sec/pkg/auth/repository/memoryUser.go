@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"gopher-playground/api-auth/pkg/auth/user"
+	"gopher-playground/api-sec/pkg/auth/user"
 )
 
 type memoryUser struct {

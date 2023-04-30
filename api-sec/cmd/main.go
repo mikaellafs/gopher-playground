@@ -4,9 +4,9 @@ import (
 	"log"
 	"os"
 
-	"gopher-playground/api-auth/pkg/config"
-	"gopher-playground/api-auth/pkg/env"
-	"gopher-playground/api-auth/pkg/http/rest/server"
+	"gopher-playground/api-sec/pkg/config"
+	"gopher-playground/api-sec/pkg/env"
+	"gopher-playground/api-sec/pkg/http/rest/server"
 
 	"github.com/joho/godotenv"
 )

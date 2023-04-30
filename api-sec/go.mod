@@ -1,4 +1,4 @@
-module gopher-playground/api-auth
+module gopher-playground/api-sec
 
 go 1.18
 

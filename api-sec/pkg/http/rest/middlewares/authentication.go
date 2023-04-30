@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	authmode "gopher-playground/api-auth/pkg/auth/mode"
-	"gopher-playground/api-auth/pkg/auth/user"
+	authmode "gopher-playground/api-sec/pkg/auth/mode"
+	"gopher-playground/api-sec/pkg/auth/user"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

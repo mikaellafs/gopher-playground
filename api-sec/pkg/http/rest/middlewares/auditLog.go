@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"gopher-playground/api-auth/pkg/auth/user"
-	apilog "gopher-playground/api-auth/pkg/log"
+	"gopher-playground/api-sec/pkg/auth/user"
+	apilog "gopher-playground/api-sec/pkg/log"
 
 	"github.com/gin-gonic/gin"
 )

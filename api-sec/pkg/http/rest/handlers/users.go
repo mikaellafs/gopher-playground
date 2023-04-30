@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"gopher-playground/api-auth/pkg/auth"
-	"gopher-playground/api-auth/pkg/auth/user"
+	"gopher-playground/api-sec/pkg/auth"
+	"gopher-playground/api-sec/pkg/auth/user"
 
 	"github.com/gin-gonic/gin"
 )

@@ -3,11 +3,11 @@ package server
 import (
 	"log"
 
-	authmode "gopher-playground/api-auth/pkg/auth/mode"
-	userrepo "gopher-playground/api-auth/pkg/auth/repository"
-	"gopher-playground/api-auth/pkg/config"
-	"gopher-playground/api-auth/pkg/http/rest/router"
-	logrepo "gopher-playground/api-auth/pkg/log/repository"
+	authmode "gopher-playground/api-sec/pkg/auth/mode"
+	userrepo "gopher-playground/api-sec/pkg/auth/repository"
+	"gopher-playground/api-sec/pkg/config"
+	"gopher-playground/api-sec/pkg/http/rest/router"
+	logrepo "gopher-playground/api-sec/pkg/log/repository"
 )
 
 func Start(cfg *config.Configuration) error {

@@ -3,7 +3,7 @@ package auth
 import (
 	"crypto/sha1"
 	"encoding/hex"
-	"gopher-playground/api-auth/pkg/env"
+	"gopher-playground/api-sec/pkg/env"
 	"os"
 
 	"golang.org/x/crypto/scrypt"

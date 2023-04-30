@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"gopher-playground/api-auth/pkg/log"
+	"gopher-playground/api-sec/pkg/log"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,8 +1,8 @@
 package router
 
 import (
-	"gopher-playground/api-auth/pkg/http/rest/handlers"
-	"gopher-playground/api-auth/pkg/log"
+	"gopher-playground/api-sec/pkg/http/rest/handlers"
+	"gopher-playground/api-sec/pkg/log"
 
 	"github.com/gin-gonic/gin"
 )
