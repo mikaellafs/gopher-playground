@@ -24,43 +24,47 @@ func NewAuditLog(r apilog.Repository) *AuditLog {
 	}
 }
 
-func (m *AuditLog) StartMiddleware(c *gin.Context) {
-	defer c.Next()
+func StartAuditLog(repo apilog.Repository) func(*gin.Context) {
+	return func(c *gin.Context) {
+		defer c.Next()
 
-	// Get user from context
-	username := getUsernameFromContext(c)
+		// Get user from context
+		username := getUsernameFromContext(c)
 
-	// Save log with no status
-	id, err := m.repo.Add(c.Request.Method, c.FullPath(), username, -1, time.Now())
-	if err != nil {
-		log.Println("Failed to save log to repository:", err.Error())
-		return
+		// Save log with no status
+		id, err := repo.Add(c.Request.Method, c.FullPath(), username, -1, time.Now())
+		if err != nil {
+			log.Println("Failed to save log to repository:", err.Error())
+			return
+		}
+
+		// Add audit log id to request context
+		c.Set(auditLogIdName, id)
 	}
-
-	// Add audit log id to request context
-	c.Set(auditLogIdName, id)
 }
 
-func (m *AuditLog) EndMiddleware(c *gin.Context) {
-	defer c.Next()
+func EndAuditLog(repo apilog.Repository) func(*gin.Context) {
+	return func(c *gin.Context) {
+		defer c.Next()
 
-	// Get audit log id from request context
-	iid, exists := c.Get(auditLogIdName)
-	now := time.Now()
+		// Get audit log id from request context
+		iid, exists := c.Get(auditLogIdName)
+		now := time.Now()
 
-	// Get user from context
-	username := getUsernameFromContext(c)
+		// Get user from context
+		username := getUsernameFromContext(c)
 
-	var err error
-	if !exists {
-		_, err = m.repo.Add(c.Request.Method, c.FullPath(), username, c.Writer.Status(), now)
-	} else {
-		id, _ := iid.(int)
-		err = m.repo.Update(id, c.Request.Method, c.FullPath(), username, c.Writer.Status(), now)
-	}
+		var err error
+		if !exists {
+			_, err = repo.Add(c.Request.Method, c.FullPath(), username, c.Writer.Status(), now)
+		} else {
+			id, _ := iid.(int)
+			err = repo.Update(id, c.Request.Method, c.FullPath(), username, c.Writer.Status(), now)
+		}
 
-	if err != nil {
-		log.Println("Failed to save log to repository:", err.Error())
+		if err != nil {
+			log.Println("Failed to save log to repository:", err.Error())
+		}
 	}
 }
 

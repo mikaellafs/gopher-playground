@@ -60,13 +60,12 @@ func healthCheck(c *gin.Context) {
 }
 
 func setMiddlewares(rg *gin.RouterGroup, cfg *Config) {
-	rg.Use(middlewares.NewRateLimiting(cfg.RateLimit, cfg.RetryAfter).Middleware)
-	rg.Use(middlewares.NewAuthenticator(cfg.AuthMode, cfg.UserRepo).Middleware)
+	rg.Use(middlewares.RateLimiting(cfg.RateLimit, cfg.RetryAfter))
+	rg.Use(middlewares.Authentication(cfg.AuthMode, cfg.UserRepo))
 
-	logMiddleware := middlewares.NewAuditLog(cfg.LogRepo)
-	rg.Use(logMiddleware.StartMiddleware)
+	rg.Use(middlewares.StartAuditLog(cfg.LogRepo))
 
-	setPostMiddleware(rg, logMiddleware.EndMiddleware)
+	setPostMiddleware(rg, middlewares.EndAuditLog(cfg.LogRepo))
 }
 
 // Middleware that need to be execute after handler

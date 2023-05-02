@@ -8,31 +8,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Authentication struct {
-	repo user.Repository
-	mode authmode.AuthMode
-}
+func Authentication(authMode authmode.AuthMode, repo user.Repository) func(*gin.Context) {
+	return func(c *gin.Context) {
+		authH := c.GetHeader("Authorization")
+		if authH == "" {
+			c.Next()
+			return
+		}
 
-func NewAuthenticator(authMode authmode.AuthMode, repo user.Repository) *Authentication {
-	return &Authentication{
-		mode: authMode,
-		repo: repo,
-	}
-}
+		user, err := authMode.Authenticate(authH, repo)
+		if err != nil {
+			c.String(http.StatusUnauthorized, err.Error())
+			c.Abort()
+		}
 
-func (m *Authentication) Middleware(c *gin.Context) {
-	authH := c.GetHeader("Authorization")
-	if authH == "" {
+		c.Set("user", user)
 		c.Next()
-		return
 	}
-
-	user, err := m.mode.Authenticate(authH, m.repo)
-	if err != nil {
-		c.String(http.StatusUnauthorized, err.Error())
-		c.Abort()
-	}
-
-	c.Set("user", user)
-	c.Next()
 }
