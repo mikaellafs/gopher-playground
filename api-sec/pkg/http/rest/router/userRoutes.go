@@ -10,7 +10,7 @@ import (
 func setUserRoutes(rg *gin.RouterGroup, r user.Repository) {
 	userGroup := rg.Group("/users")
 
-	userHandler := handlers.NewUserHandler(r)
+	userGroup.POST("", handlers.CreateUser(r))
 
-	userGroup.POST("", userHandler.CriarUsuario)
+	// userGroup.DELETE("", handlers.DeleteUser(r))
 }

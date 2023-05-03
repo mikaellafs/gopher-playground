@@ -10,60 +10,54 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserHandler struct {
-	repo user.Repository
-}
-
-func NewUserHandler(r user.Repository) *UserHandler {
-	return &UserHandler{
-		repo: r,
-	}
-}
-
 type criarUsuarioBody struct {
 	Name     string `json:"name" binding:"required"`
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-func (h *UserHandler) CriarUsuario(c *gin.Context) {
-	// Get body
-	var body criarUsuarioBody
-	if err := c.Bind(&body); err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
+func CreateUser(repo user.Repository) func(*gin.Context) {
+	return func(c *gin.Context) {
+		// Get body
+		var body criarUsuarioBody
+		if err := c.Bind(&body); err != nil {
+			c.String(http.StatusBadRequest, err.Error())
+			return
+		}
 
-	// Create user
-	hashedPassword, err := auth.Encrypt(body.Password)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Failed to encrypt password:"+err.Error())
-	}
+		// Create user
+		hashedPassword, err := auth.Encrypt(body.Password)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Failed to encrypt password:"+err.Error())
+		}
 
-	_, err = h.repo.CreateUser(context.TODO(), body.Username, hashedPassword, body.Name)
-	if err != nil {
-		c.String(httpStatusFor(err), err.Error())
-		return
-	}
+		_, err = repo.CreateUser(context.TODO(), body.Username, hashedPassword, body.Name)
+		if err != nil {
+			c.String(httpStatusFor(err), err.Error())
+			return
+		}
 
-	c.Status(http.StatusCreated)
+		c.Status(http.StatusCreated)
+	}
 }
 
-func (h *UserHandler) DeleteUser(c *gin.Context) {
-	ctxUser, exists := c.Get("user")
-	if !exists {
-		c.String(http.StatusInternalServerError, "Failed to get user from context")
-		return
-	}
+func DeleteUser(repo user.Repository) func(*gin.Context) {
+	return func(c *gin.Context) {
+		ctxUser, exists := c.Get("user")
+		if !exists {
+			c.String(http.StatusInternalServerError, "Failed to get user from context")
+			return
+		}
 
-	u, _ := ctxUser.(*user.User)
-	err := h.repo.DeleteUser(context.TODO(), u.Username)
-	if err != nil {
-		c.String(httpStatusFor(err), err.Error())
-		return
-	}
+		u, _ := ctxUser.(*user.User)
+		err := repo.DeleteUser(context.TODO(), u.Username)
+		if err != nil {
+			c.String(httpStatusFor(err), err.Error())
+			return
+		}
 
-	c.Status(http.StatusOK)
+		c.Status(http.StatusOK)
+	}
 }
 
 // TODO: move to package

@@ -10,6 +10,5 @@ import (
 func setLogsRoute(rg *gin.RouterGroup, r log.Repository) {
 	logsGroup := rg.Group("/logs")
 
-	lhandler := handlers.NewLogsHandler(r)
-	logsGroup.GET("", lhandler.ListAll)
+	logsGroup.GET("", handlers.ListAllLogs(r))
 }

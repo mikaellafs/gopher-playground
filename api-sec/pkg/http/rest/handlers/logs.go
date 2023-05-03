@@ -8,18 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type LogsHandler struct {
-	repo log.Repository
-}
+func ListAllLogs(repo log.Repository) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		result := repo.ReadAll()
 
-func NewLogsHandler(r log.Repository) *LogsHandler {
-	return &LogsHandler{
-		repo: r,
+		c.JSON(http.StatusOK, result)
 	}
-}
-
-func (h *LogsHandler) ListAll(c *gin.Context) {
-	result := h.repo.ReadAll()
-
-	c.JSON(http.StatusOK, result)
 }

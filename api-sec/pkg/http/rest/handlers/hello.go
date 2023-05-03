@@ -8,21 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type HelloHandler struct {
-}
+func Hello() func(*gin.Context) {
+	return func(c *gin.Context) {
+		u, exists := c.Get("user")
+		if !exists {
+			c.String(http.StatusBadRequest, "Missing user")
+			c.Abort()
+		}
 
-func NewHelloHandler() *HelloHandler {
-	return &HelloHandler{}
-}
+		user, _ := u.(*user.User)
 
-func (h *HelloHandler) Say(c *gin.Context) {
-	u, exists := c.Get("user")
-	if !exists {
-		c.String(http.StatusBadRequest, "Missing user")
-		c.Abort()
+		c.String(http.StatusOK, "Hi, "+user.Name+"!")
 	}
-
-	user, _ := u.(*user.User)
-
-	c.String(http.StatusOK, "Hi, "+user.Name+"!")
 }
