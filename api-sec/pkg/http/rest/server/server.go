@@ -2,10 +2,13 @@ package server
 
 import (
 	"log"
+	"os"
 
+	"gopher-playground/api-sec/pkg/auth/accesscontrol"
 	authmode "gopher-playground/api-sec/pkg/auth/mode"
 	userrepo "gopher-playground/api-sec/pkg/auth/repository"
 	"gopher-playground/api-sec/pkg/config"
+	"gopher-playground/api-sec/pkg/env"
 	"gopher-playground/api-sec/pkg/http/rest/router"
 	logrepo "gopher-playground/api-sec/pkg/log/repository"
 )
@@ -21,6 +24,13 @@ func Start(cfg *config.Configuration) error {
 		return err
 	}
 
+	// Create access control
+	ac := accesscontrol.NewFileCasbinAC(os.Getenv(env.CASBIN_CONFIG_PATH), os.Getenv(env.CASBIN_POLICY_PATH))
+	err = ac.LoadPolicy()
+	if err != nil {
+		return err
+	}
+
 	// Router config
 	rcfg := &router.Config{
 		RateLimit:  cfg.Server.RateLimit,
@@ -29,7 +39,8 @@ func Start(cfg *config.Configuration) error {
 		UserRepo: userRepo,
 		LogRepo:  logRepo,
 
-		AuthMode: mode,
+		AuthMode:      mode,
+		AccessControl: ac,
 	}
 
 	r := router.Initialize(rcfg)

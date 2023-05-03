@@ -1,0 +1,8 @@
+p, admin, /api/logs, GET
+p, admin, /api/users, GET
+
+p, user, /api/hello, GET
+p, user, /api/users, DELETE
+
+g, geraldo, admin
+g, mikaella, user
