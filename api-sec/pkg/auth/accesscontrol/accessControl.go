@@ -5,6 +5,9 @@ type AccessControl interface {
 
 	Enforce(values ...interface{}) (bool, error)
 
-	// AddPolicy(p string) error
+	AddPolicy(p ...interface{}) error
 	// RemovePolicy(p string) error
+
+	AssignRoleToUser(user, role string) error
+	RemoveUser(user string) error
 }
