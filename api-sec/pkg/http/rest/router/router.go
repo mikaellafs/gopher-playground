@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	ac "gopher-playground/api-sec/pkg/auth/accesscontrol"
 	authmode "gopher-playground/api-sec/pkg/auth/mode"
 	"gopher-playground/api-sec/pkg/auth/user"
 	"gopher-playground/api-sec/pkg/http/rest/middlewares"
@@ -23,6 +24,8 @@ type Config struct {
 
 	UserRepo user.Repository
 	LogRepo  log.Repository
+
+	AccessControl ac.AccessControl
 }
 
 func Initialize(cfg *Config) *gin.Engine {
@@ -46,11 +49,11 @@ func Initialize(cfg *Config) *gin.Engine {
 
 	rg.GET("/", healthCheck)
 
-	setMiddlewares(rg, cfg)
+	setGlobalMiddlewares(rg, cfg)
 
-	setUserRoutes(rg, cfg.UserRepo)
-	setHelloRoutes(rg)
-	setLogsRoute(rg, cfg.LogRepo)
+	setUserRoutes(rg, cfg.UserRepo, cfg.AccessControl)
+	setHelloRoutes(rg, cfg.AccessControl)
+	setLogsRoute(rg, cfg.LogRepo, cfg.AccessControl)
 
 	return r
 }
@@ -59,7 +62,7 @@ func healthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, "OK")
 }
 
-func setMiddlewares(rg *gin.RouterGroup, cfg *Config) {
+func setGlobalMiddlewares(rg *gin.RouterGroup, cfg *Config) {
 	rg.Use(middlewares.RateLimiting(cfg.RateLimit, cfg.RetryAfter))
 	rg.Use(middlewares.Authentication(cfg.AuthMode, cfg.UserRepo))
 
