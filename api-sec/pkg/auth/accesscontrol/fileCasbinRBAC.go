@@ -6,22 +6,22 @@ import (
 )
 
 // Implement RBAC
-type FileCasbin struct {
+type FileCasbinRBAC struct {
 	pathToData string
 	pathToConf string
 	e          *casbin.Enforcer
 }
 
-var _ AccessControl = (*FileCasbin)(nil)
+var _ AccessControl = (*FileCasbinRBAC)(nil)
 
-func NewFileCasbinAC(pathToConf, pathToData string) *FileCasbin {
-	return &FileCasbin{
+func NewFileCasbinRBAC(pathToConf, pathToData string) *FileCasbinRBAC {
+	return &FileCasbinRBAC{
 		pathToConf: pathToConf,
 		pathToData: pathToData,
 	}
 }
 
-func (ac *FileCasbin) LoadPolicy() error {
+func (ac *FileCasbinRBAC) LoadPolicy() error {
 	// Create an adapter to read and record policies in a file
 	adapter := fileadapter.NewAdapter(ac.pathToData)
 
@@ -35,7 +35,7 @@ func (ac *FileCasbin) LoadPolicy() error {
 	return nil
 }
 
-func (ac *FileCasbin) Enforce(values ...interface{}) (bool, error) {
+func (ac *FileCasbinRBAC) Enforce(values ...interface{}) (bool, error) {
 	allowed, err := ac.e.Enforce(values...)
 	if err != nil {
 		return false, err
@@ -44,7 +44,7 @@ func (ac *FileCasbin) Enforce(values ...interface{}) (bool, error) {
 	return allowed, nil
 }
 
-func (ac *FileCasbin) AddPolicy(p ...interface{}) error {
+func (ac *FileCasbinRBAC) AddPolicy(p ...interface{}) error {
 	_, err := ac.e.AddPolicy(p...)
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func (ac *FileCasbin) AddPolicy(p ...interface{}) error {
 	return ac.e.SavePolicy()
 }
 
-func (ac *FileCasbin) AssignRoleToUser(user, role string) error {
+func (ac *FileCasbinRBAC) AssignRoleToUser(user, role string) error {
 	_, err := ac.e.AddGroupingPolicy(user, role)
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func (ac *FileCasbin) AssignRoleToUser(user, role string) error {
 	return ac.e.SavePolicy()
 }
 
-func (ac *FileCasbin) RemoveUser(user string) error {
+func (ac *FileCasbinRBAC) RemoveUser(user string) error {
 	_, err := ac.e.RemoveFilteredPolicy(0, user)
 	if err != nil {
 		return err

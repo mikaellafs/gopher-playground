@@ -25,7 +25,7 @@ func Start(cfg *config.Configuration) error {
 	}
 
 	// Create access control
-	ac := accesscontrol.NewFileCasbinAC(os.Getenv(env.CASBIN_CONFIG_PATH), os.Getenv(env.CASBIN_POLICY_PATH))
+	ac := accesscontrol.NewFileCasbinRBAC(os.Getenv(env.CASBIN_CONFIG_PATH), os.Getenv(env.CASBIN_POLICY_PATH))
 	err = ac.LoadPolicy()
 	if err != nil {
 		return err
