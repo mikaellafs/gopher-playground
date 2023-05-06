@@ -6,7 +6,10 @@ import (
 	"strings"
 
 	"gopher-playground/api-sec/pkg/auth"
+	"gopher-playground/api-sec/pkg/auth/token"
 	"gopher-playground/api-sec/pkg/auth/user"
+
+	"github.com/gin-gonic/gin"
 )
 
 type BasicAuth struct {
@@ -43,4 +46,8 @@ func (a *BasicAuth) Authenticate(authHeader string, userRepo user.Repository) (*
 	}
 
 	return user, nil
+}
+
+func (a *BasicAuth) GenerateToken(tstore token.TokenStore, c *gin.Context) *token.Token {
+	return nil
 }

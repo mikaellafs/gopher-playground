@@ -6,6 +6,7 @@ import (
 
 	ac "gopher-playground/api-sec/pkg/auth/accesscontrol"
 	authmode "gopher-playground/api-sec/pkg/auth/mode"
+	"gopher-playground/api-sec/pkg/auth/token"
 	"gopher-playground/api-sec/pkg/auth/user"
 	"gopher-playground/api-sec/pkg/http/rest/middlewares"
 	"gopher-playground/api-sec/pkg/log"
@@ -20,12 +21,12 @@ type Config struct {
 	RateLimit  int
 	RetryAfter float64
 
-	AuthMode authmode.AuthMode
+	AuthMode      authmode.AuthMode
+	AccessControl ac.AccessControl
+	TokenStore    token.TokenStore
 
 	UserRepo user.Repository
 	LogRepo  log.Repository
-
-	AccessControl ac.AccessControl
 }
 
 func Initialize(cfg *Config) *gin.Engine {
@@ -51,6 +52,7 @@ func Initialize(cfg *Config) *gin.Engine {
 
 	setGlobalMiddlewares(rg, cfg)
 
+	setAuthRoutes(rg, cfg.UserRepo, cfg.AuthMode, cfg.TokenStore)
 	setUserRoutes(rg, cfg.UserRepo, cfg.AccessControl)
 	setHelloRoutes(rg, cfg.AccessControl)
 	setLogsRoute(rg, cfg.LogRepo, cfg.AccessControl)

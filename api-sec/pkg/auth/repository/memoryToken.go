@@ -23,7 +23,7 @@ type MemoryToken struct {
 
 var _ token.TokenStore = (*MemoryToken)(nil)
 
-func NewInMemoryTokenStore(MemoryToken) *MemoryToken {
+func NewInMemoryTokenStore() *MemoryToken {
 	return &MemoryToken{
 		tokens: map[string]*mtoken{},
 		mutex:  &sync.Mutex{},
