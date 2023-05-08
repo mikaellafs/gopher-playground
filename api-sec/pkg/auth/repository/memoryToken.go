@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"gopher-playground/api-sec/pkg/auth/token"
-
-	"github.com/google/uuid"
 )
 
 type mtoken struct {
@@ -19,19 +17,25 @@ type mtoken struct {
 type MemoryToken struct {
 	tokens map[string]*mtoken
 	mutex  *sync.Mutex
+
+	generateId func() (string, error)
 }
 
 var _ token.TokenStore = (*MemoryToken)(nil)
 
-func NewInMemoryTokenStore() *MemoryToken {
+func NewInMemoryTokenStore(generateId func() (string, error)) *MemoryToken {
 	return &MemoryToken{
-		tokens: map[string]*mtoken{},
-		mutex:  &sync.Mutex{},
+		tokens:     map[string]*mtoken{},
+		mutex:      &sync.Mutex{},
+		generateId: generateId,
 	}
 }
 
-func (r *MemoryToken) Create(t token.Token) string {
-	newId := uuid.New().String()
+func (r *MemoryToken) Create(t token.Token) (string, error) {
+	newId, err := r.generateId()
+	if err != nil {
+		return "", err
+	}
 
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
@@ -43,7 +47,7 @@ func (r *MemoryToken) Create(t token.Token) string {
 		att:      t.Attributes,
 	}
 
-	return newId
+	return newId, nil
 }
 
 func (r *MemoryToken) Read(id string) *token.Token {

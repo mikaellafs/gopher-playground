@@ -41,8 +41,10 @@ func Login(userRepo user.Repository, authMode authmode.AuthMode, tstore token.To
 		t := authMode.GenerateToken(tstore, c)
 
 		// Send response
-		c.JSON(http.StatusOK, map[string]token.Token{
-			"token": *t,
-		})
+		if t != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"token": *t,
+			})
+		}
 	}
 }
