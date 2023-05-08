@@ -13,7 +13,7 @@ func setLogsRoute(rg *gin.RouterGroup, r log.Repository, ac ac.AccessControl) {
 	logsGroup := rg.Group("/logs")
 
 	// Set acces control to route
-	logsGroup.Use(middlewares.AccessControl(ac))
+	logsGroup.Use(middlewares.RequireAuth(), middlewares.AccessControl(ac))
 
 	logsGroup.GET("", handlers.ListAllLogs(r))
 }

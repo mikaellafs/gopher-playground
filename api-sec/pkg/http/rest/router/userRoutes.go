@@ -14,6 +14,6 @@ func setUserRoutes(rg *gin.RouterGroup, r user.Repository, ac ac.AccessControl) 
 
 	userGroup.POST("", handlers.CreateUser(r, ac))
 
-	userGroup.Use(middlewares.AccessControl(ac))
+	userGroup.Use(middlewares.RequireAuth(), middlewares.AccessControl(ac))
 	userGroup.DELETE("", handlers.DeleteUser(r, ac))
 }

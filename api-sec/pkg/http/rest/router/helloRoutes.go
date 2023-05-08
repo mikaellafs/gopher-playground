@@ -12,7 +12,7 @@ func setHelloRoutes(rg *gin.RouterGroup, ac ac.AccessControl) {
 	helloGroup := rg.Group("/hello")
 
 	// Set acces control to route
-	helloGroup.Use(middlewares.AccessControl(ac))
+	helloGroup.Use(middlewares.RequireAuth(), middlewares.AccessControl(ac))
 
 	helloGroup.GET("", handlers.Hello())
 }
