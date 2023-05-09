@@ -10,11 +10,12 @@ import (
 )
 
 var (
+	ErrMissingAuthHeader  = errors.New("Missing auth header")
 	ErrInvalidAuthHeader  = errors.New("Invalid auth header")
 	ErrInvalidCredentials = errors.New("Invalid credentials")
 )
 
 type AuthMode interface {
-	Authenticate(authHeader string, userRepo user.Repository) (*user.User, error)
-	GenerateToken(tstore token.TokenStore, c *gin.Context) *token.Token
+	Authenticate(c *gin.Context, userRepo user.Repository) (*user.User, error)
+	GenerateToken(c *gin.Context) *token.Token
 }

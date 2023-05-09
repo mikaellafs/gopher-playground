@@ -12,13 +12,7 @@ const authErrKeyName string = "auth-error"
 
 func Authentication(authMode authmode.AuthMode, repo user.Repository) func(*gin.Context) {
 	return func(c *gin.Context) {
-		authH := c.GetHeader("Authorization")
-		if authH == "" {
-			c.Next()
-			return
-		}
-
-		user, err := authMode.Authenticate(authH, repo)
+		user, err := authMode.Authenticate(c, repo)
 		if err != nil {
 			c.Set(authErrKeyName, err.Error())
 			c.Next()

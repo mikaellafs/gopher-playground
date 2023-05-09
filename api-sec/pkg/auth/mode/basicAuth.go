@@ -17,7 +17,12 @@ type BasicAuth struct {
 
 var _ AuthMode = (*BasicAuth)(nil)
 
-func (a *BasicAuth) Authenticate(authHeader string, userRepo user.Repository) (*user.User, error) {
+func (a *BasicAuth) Authenticate(c *gin.Context, userRepo user.Repository) (*user.User, error) {
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		return nil, ErrMissingAuthHeader
+	}
+
 	if !strings.HasPrefix(authHeader, "Basic ") {
 		return nil, ErrInvalidAuthHeader
 	}
@@ -48,6 +53,6 @@ func (a *BasicAuth) Authenticate(authHeader string, userRepo user.Repository) (*
 	return user, nil
 }
 
-func (a *BasicAuth) GenerateToken(tstore token.TokenStore, c *gin.Context) *token.Token {
+func (a *BasicAuth) GenerateToken(c *gin.Context) *token.Token {
 	return nil
 }
