@@ -50,24 +50,26 @@ func (r *MemoryToken) Create(t token.Token) (string, error) {
 	return newId, nil
 }
 
-func (r *MemoryToken) Read(id string) *token.Token {
+func (r *MemoryToken) Read(id string) (*token.Token, error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
 	if r.tokens[id] == nil {
-		return nil
+		return nil, token.ErrInvalidToken
 	}
 
 	return &token.Token{
 		Username:   r.tokens[id].username,
 		ExpireAt:   r.tokens[id].expireAt,
 		Attributes: r.tokens[id].att,
-	}
+	}, nil
 }
 
-func (r *MemoryToken) Delete(id string) {
+func (r *MemoryToken) Delete(id string) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
 	r.tokens[id] = nil
+
+	return nil
 }
