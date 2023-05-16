@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	authmode "gopher-playground/api-sec/pkg/auth/mode"
-	"gopher-playground/api-sec/pkg/auth/user"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,9 +9,9 @@ import (
 
 const authErrKeyName string = "auth-error"
 
-func Authentication(authMode authmode.AuthMode, repo user.Repository) func(*gin.Context) {
+func Authentication(authMode authmode.AuthMode) func(*gin.Context) {
 	return func(c *gin.Context) {
-		user, err := authMode.Authenticate(c, repo)
+		user, err := authMode.Authenticate(c)
 		if err != nil {
 			c.Set(authErrKeyName, err.Error())
 			c.Next()

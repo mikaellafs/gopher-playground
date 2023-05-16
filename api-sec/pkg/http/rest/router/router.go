@@ -66,7 +66,7 @@ func healthCheck(c *gin.Context) {
 
 func setGlobalMiddlewares(rg *gin.RouterGroup, cfg *Config) {
 	rg.Use(middlewares.RateLimiting(cfg.RateLimit, cfg.RetryAfter))
-	rg.Use(middlewares.Authentication(cfg.AuthMode, cfg.UserRepo))
+	rg.Use(middlewares.Authentication(cfg.AuthMode))
 	rg.Use(middlewares.StartAuditLog(cfg.LogRepo))
 
 	setPostMiddleware(rg, middlewares.EndAuditLog(cfg.LogRepo))

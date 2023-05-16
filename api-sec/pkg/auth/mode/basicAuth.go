@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"strings"
+	"time"
 
 	"gopher-playground/api-sec/pkg/auth"
 	"gopher-playground/api-sec/pkg/auth/token"
@@ -13,11 +14,18 @@ import (
 )
 
 type BasicAuth struct {
+	userRepo user.Repository
 }
 
 var _ AuthMode = (*BasicAuth)(nil)
 
-func (a *BasicAuth) Authenticate(c *gin.Context, userRepo user.Repository) (*user.User, error) {
+func NewBasicAuth(repo user.Repository) *BasicAuth {
+	return &BasicAuth{
+		userRepo: repo,
+	}
+}
+
+func (a *BasicAuth) Authenticate(c *gin.Context) (*user.User, error) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
 		return nil, ErrMissingAuthHeader
@@ -41,7 +49,7 @@ func (a *BasicAuth) Authenticate(c *gin.Context, userRepo user.Repository) (*use
 
 	// Check credentials
 	username, password := credArr[0], credArr[1]
-	user, err := userRepo.ReadUser(context.TODO(), username)
+	user, err := a.userRepo.ReadUser(context.TODO(), username)
 	if err != nil {
 		return nil, ErrInvalidCredentials
 	}
@@ -53,6 +61,6 @@ func (a *BasicAuth) Authenticate(c *gin.Context, userRepo user.Repository) (*use
 	return user, nil
 }
 
-func (a *BasicAuth) GenerateToken(c *gin.Context) *token.Token {
+func (a *BasicAuth) GenerateToken(c *gin.Context, username string, expireAt time.Time) *token.Token {
 	return nil
 }

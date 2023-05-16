@@ -2,6 +2,7 @@ package mode
 
 import (
 	"errors"
+	"time"
 
 	"gopher-playground/api-sec/pkg/auth/token"
 	"gopher-playground/api-sec/pkg/auth/user"
@@ -16,6 +17,6 @@ var (
 )
 
 type AuthMode interface {
-	Authenticate(c *gin.Context, userRepo user.Repository) (*user.User, error)
-	GenerateToken(c *gin.Context) *token.Token
+	Authenticate(c *gin.Context) (*user.User, error)
+	GenerateToken(c *gin.Context, username string, expireAt time.Time) *token.Token
 }
