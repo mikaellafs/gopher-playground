@@ -36,7 +36,7 @@ func (a *SessionCookies) Authenticate(c *gin.Context) (*user.User, error) {
 
 	// Read token from store
 	t, err := a.tokenStore.Read(sTokenId)
-	if err == nil {
+	if err != nil {
 		return nil, err
 	}
 
