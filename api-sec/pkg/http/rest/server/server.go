@@ -7,6 +7,7 @@ import (
 	"gopher-playground/api-sec/pkg/auth/accesscontrol"
 	authmode "gopher-playground/api-sec/pkg/auth/mode"
 	authrepo "gopher-playground/api-sec/pkg/auth/repository"
+	"gopher-playground/api-sec/pkg/auth/token"
 	"gopher-playground/api-sec/pkg/config"
 	"gopher-playground/api-sec/pkg/env"
 	"gopher-playground/api-sec/pkg/http/rest/router"
@@ -18,10 +19,10 @@ func Start(cfg *config.Configuration) error {
 	userRepo := authrepo.NewMemoryUserRepository()
 	logRepo := logrepo.NewMemoryAuditLogRepository()
 
-	tokenStore := authrepo.NewInMemoryTokenStore()
+	tokenStore := authrepo.NewInMemoryTokenStore(token.GenerateRandTokenString)
 
 	// Get auth mode
-	mode, err := authmode.Get(cfg.Auth.Mode)
+	mode, err := authmode.Get(cfg.Auth.Mode, userRepo, tokenStore)
 	if err != nil {
 		return err
 	}

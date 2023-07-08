@@ -9,4 +9,4 @@ server:
     key_path: "certs/server/server.key"
 
 auth:
-  mode: "basic"
+  mode: "session_cookies" # basic, session_cookies
