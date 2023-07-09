@@ -57,3 +57,19 @@ func (a *SessionCookies) GenerateToken(c *gin.Context, username string, expireAt
 
 	return stoken
 }
+
+func (a *SessionCookies) Logout(c *gin.Context) {
+	sTokenId, err := c.Cookie(sessionTokenName)
+	if err != nil {
+		return
+	}
+
+	// Delete from store
+	err = a.tokenStore.Delete(sTokenId)
+	if err != nil {
+		return
+	}
+
+	// Clean cookie
+	c.SetCookie(sessionTokenName, "", -1, "", "", false, true)
+}

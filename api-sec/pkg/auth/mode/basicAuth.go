@@ -64,3 +64,7 @@ func (a *BasicAuth) Authenticate(c *gin.Context) (*user.User, error) {
 func (a *BasicAuth) GenerateToken(c *gin.Context, username string, expireAt time.Time) *token.Token {
 	return nil
 }
+
+func (a *BasicAuth) Logout(c *gin.Context) {
+
+}

@@ -49,3 +49,10 @@ func Login(userRepo user.Repository, authMode authmode.AuthMode, tstore token.To
 		}
 	}
 }
+
+func Logout(authMode authmode.AuthMode) func(*gin.Context) {
+	return func(c *gin.Context) {
+		authMode.Logout(c)
+		c.Status(http.StatusNoContent)
+	}
+}

@@ -11,12 +11,13 @@ import (
 )
 
 var (
-	ErrMissingAuthHeader  = errors.New("Missing auth header")
-	ErrInvalidAuthHeader  = errors.New("Invalid auth header")
-	ErrInvalidCredentials = errors.New("Invalid credentials")
+	ErrMissingAuthHeader  = errors.New("missing auth header")
+	ErrInvalidAuthHeader  = errors.New("invalid auth header")
+	ErrInvalidCredentials = errors.New("invalid credentials")
 )
 
 type AuthMode interface {
 	Authenticate(c *gin.Context) (*user.User, error)
 	GenerateToken(c *gin.Context, username string, expireAt time.Time) *token.Token
+	Logout(c *gin.Context)
 }

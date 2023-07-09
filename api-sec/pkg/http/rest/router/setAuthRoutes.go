@@ -11,4 +11,5 @@ import (
 
 func setAuthRoutes(rg *gin.RouterGroup, repo user.Repository, mode mode.AuthMode, tstore token.TokenStore) {
 	rg.POST("/login", handlers.Login(repo, mode, tstore))
+	rg.POST("/logout", handlers.Logout(mode))
 }

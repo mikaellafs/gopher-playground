@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	ErrInvalidAuthMode = errors.New("Invalid auth mode.")
+	ErrInvalidAuthMode = errors.New("invalid auth mode")
 )
 
 func Get(mode string, urepo user.Repository, tstore token.TokenStore) (AuthMode, error) {
