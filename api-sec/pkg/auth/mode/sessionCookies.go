@@ -40,6 +40,12 @@ func (a *SessionCookies) Authenticate(c *gin.Context) (*user.User, error) {
 		return nil, err
 	}
 
+	// Check token is expired
+	if t.SecondsUntilExpiration() <= 0 {
+		a.tokenStore.Delete(sTokenId)
+		return nil, token.ErrInvalidToken
+	}
+
 	return a.userRepo.ReadUser(context.TODO(), t.Username)
 }
 
