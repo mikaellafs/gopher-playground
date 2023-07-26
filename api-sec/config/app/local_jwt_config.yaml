@@ -9,4 +9,8 @@ server:
     key_path: "certs/server/server.key"
 
 auth:
-  mode: "basic" # basic, session_cookies, jwt
+  mode: "jwt"
+  duration_minutes: 10
+  refresh_duration_minutes: 60
+  max_refresh_minutes: 144
+  signing_algorithm: HS256

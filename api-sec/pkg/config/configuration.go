@@ -19,5 +19,9 @@ type Https struct {
 }
 
 type Auth struct {
-	Mode string `yaml:"mode"`
+	Mode                   string `yaml:"mode"`
+	SigningAlgorithm       string `yaml:"signing_algorithm"`
+	DurationMinutes        int    `yaml:"duration_minutes"`
+	RefreshDurationMinutes int    `yaml:"refresh_duration_minutes"`
+	MaxRefreshMinutes      int    `yaml:"max_refresh_minutes"`
 }
