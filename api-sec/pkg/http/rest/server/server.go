@@ -22,7 +22,7 @@ func Start(cfg *config.Configuration) error {
 	tokenStore := authrepo.NewInMemoryTokenStore(token.GenerateRandTokenString)
 
 	// Get auth mode
-	mode, err := authmode.Get(cfg.Auth.Mode, userRepo, tokenStore)
+	mode, err := authmode.Get(cfg.Auth, userRepo, tokenStore)
 	if err != nil {
 		return err
 	}
