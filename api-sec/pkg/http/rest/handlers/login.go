@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"gopher-playground/api-sec/pkg/auth"
 	authmode "gopher-playground/api-sec/pkg/auth/mode"
@@ -39,7 +38,11 @@ func Login(userRepo user.Repository, authMode authmode.AuthMode, tstore token.To
 		}
 
 		// Generate auth token
-		t := authMode.GenerateToken(c, username, time.Now().Add(30*time.Minute))
+		t, err := authMode.GenerateToken(c, username)
+		if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
 
 		// Send response
 		if t != nil {

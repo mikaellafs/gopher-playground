@@ -49,19 +49,22 @@ func (a *SessionCookies) Authenticate(c *gin.Context) (*user.User, error) {
 	return a.userRepo.ReadUser(context.TODO(), t.Username)
 }
 
-func (a *SessionCookies) GenerateToken(c *gin.Context, username string, expireAt time.Time) *token.Token {
+func (a *SessionCookies) GenerateToken(c *gin.Context, username string) (*token.Token, error) {
 	stoken := &token.Token{
 		Username:   username,
-		ExpireAt:   expireAt,
+		ExpireAt:   time.Now().Add(30 * time.Minute),
 		Attributes: map[string]string{},
 	}
 
-	tId, _ := a.tokenStore.Create(*stoken)
+	tId, err := a.tokenStore.Create(*stoken)
+	if err != nil {
+		return nil, err
+	}
 
 	// Add cookie
 	c.SetCookie(sessionTokenName, tId, stoken.SecondsUntilExpiration(), "/", "", false, true)
 
-	return stoken
+	return stoken, nil
 }
 
 func (a *SessionCookies) Logout(c *gin.Context) {

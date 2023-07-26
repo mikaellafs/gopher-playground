@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"strings"
-	"time"
 
 	"gopher-playground/api-sec/pkg/auth"
 	"gopher-playground/api-sec/pkg/auth/token"
@@ -61,8 +60,8 @@ func (a *BasicAuth) Authenticate(c *gin.Context) (*user.User, error) {
 	return user, nil
 }
 
-func (a *BasicAuth) GenerateToken(c *gin.Context, username string, expireAt time.Time) *token.Token {
-	return nil
+func (a *BasicAuth) GenerateToken(c *gin.Context, username string) (*token.Token, error) {
+	return nil, nil
 }
 
 func (a *BasicAuth) Logout(c *gin.Context) {
