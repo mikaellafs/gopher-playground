@@ -82,3 +82,7 @@ func (a *SessionCookies) Logout(c *gin.Context) {
 	// Clean cookie
 	c.SetCookie(sessionTokenName, "", -1, "", "", false, true)
 }
+
+func (a *SessionCookies) Refresh(c *gin.Context) (*token.Token, error) {
+	return nil, nil
+}

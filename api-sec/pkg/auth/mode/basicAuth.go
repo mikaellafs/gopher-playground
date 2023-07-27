@@ -67,3 +67,7 @@ func (a *BasicAuth) GenerateToken(c *gin.Context, username string) (*token.Token
 func (a *BasicAuth) Logout(c *gin.Context) {
 
 }
+
+func (a *BasicAuth) Refresh(c *gin.Context) (*token.Token, error) {
+	return nil, nil
+}

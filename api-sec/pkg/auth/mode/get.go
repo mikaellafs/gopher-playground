@@ -27,7 +27,7 @@ func Get(config *config.Auth, urepo user.Repository, tstore token.TokenStore) (A
 	case modeSessionCookies:
 		return NewSessionCookiesAuth(urepo, tstore), nil
 	case modeJwt:
-		return NewJwtAuth(urepo, config.SigningAlgorithm, config.DurationMinutes, config.RefreshDurationMinutes, config.MaxRefreshMinutes), nil
+		return NewJwtAuth(urepo, config.SigningAlgorithm, config.DurationMinutes, config.RefreshDurationMinutes), nil
 	}
 
 	return nil, ErrInvalidAuthMode

@@ -12,5 +12,4 @@ auth:
   mode: "jwt"
   duration_minutes: 10
   refresh_duration_minutes: 60
-  max_refresh_minutes: 144
   signing_algorithm: HS256

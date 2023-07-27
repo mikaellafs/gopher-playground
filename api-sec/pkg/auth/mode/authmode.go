@@ -18,5 +18,6 @@ var (
 type AuthMode interface {
 	Authenticate(c *gin.Context) (*user.User, error)
 	GenerateToken(c *gin.Context, username string) (*token.Token, error)
+	Refresh(c *gin.Context) (*token.Token, error)
 	Logout(c *gin.Context)
 }

@@ -3,7 +3,7 @@ package token
 import "errors"
 
 var (
-	ErrInvalidToken = errors.New("Invalid token")
+	ErrInvalidToken = errors.New("invalid token")
 )
 
 type TokenStore interface {

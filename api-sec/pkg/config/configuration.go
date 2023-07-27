@@ -23,5 +23,4 @@ type Auth struct {
 	SigningAlgorithm       string `yaml:"signing_algorithm"`
 	DurationMinutes        int    `yaml:"duration_minutes"`
 	RefreshDurationMinutes int    `yaml:"refresh_duration_minutes"`
-	MaxRefreshMinutes      int    `yaml:"max_refresh_minutes"`
 }

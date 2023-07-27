@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Login(userRepo user.Repository, authMode authmode.AuthMode, tstore token.TokenStore) func(*gin.Context) {
+func Login(userRepo user.Repository, authMode authmode.AuthMode) func(*gin.Context) {
 	return func(c *gin.Context) {
 		// Parse 'application/x-www-form-urlencoded'
 		err := c.Request.ParseForm()
@@ -57,5 +57,24 @@ func Logout(authMode authmode.AuthMode) func(*gin.Context) {
 	return func(c *gin.Context) {
 		authMode.Logout(c)
 		c.Status(http.StatusNoContent)
+	}
+}
+
+func Refresh(authMode authmode.AuthMode) func(*gin.Context) {
+	return func(c *gin.Context) {
+		t, err := authMode.Refresh(c)
+		if err != nil && err == token.ErrInvalidToken {
+			c.String(http.StatusUnauthorized, err.Error())
+			return
+		} else if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"token": *t,
+			})
+		}
 	}
 }
