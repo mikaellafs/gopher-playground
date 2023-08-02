@@ -8,6 +8,7 @@ import (
 	authmode "gopher-playground/api-sec/pkg/auth/mode"
 	"gopher-playground/api-sec/pkg/auth/token"
 	"gopher-playground/api-sec/pkg/auth/user"
+	"gopher-playground/api-sec/pkg/http/rest/handlers"
 	"gopher-playground/api-sec/pkg/http/rest/middlewares"
 	"gopher-playground/api-sec/pkg/log"
 
@@ -45,6 +46,8 @@ func Initialize(cfg *Config) *gin.Engine {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+	r.LoadHTMLGlob("pkg/http/web/*")
+	r.GET("/home", handlers.HandleHomePage)
 
 	rg := r.Group("/api")
 
@@ -52,6 +55,7 @@ func Initialize(cfg *Config) *gin.Engine {
 
 	setGlobalMiddlewares(rg, cfg)
 
+	setOauth2Routes(rg)
 	setAuthRoutes(rg, cfg.UserRepo, cfg.AuthMode)
 	setUserRoutes(rg, cfg.UserRepo, cfg.AccessControl)
 	setHelloRoutes(rg, cfg.AccessControl)

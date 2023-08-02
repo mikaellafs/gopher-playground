@@ -7,9 +7,15 @@ require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.0
 	github.com/joho/godotenv v1.5.1
-	golang.org/x/crypto v0.5.0
+	golang.org/x/crypto v0.11.0
 	golang.org/x/time v0.3.0
 	gopkg.in/yaml.v2 v2.4.0
+)
+
+require (
+	github.com/golang/protobuf v1.5.3 // indirect
+	golang.org/x/oauth2 v0.10.0 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
 )
 
 require (
@@ -33,9 +39,9 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.9 // indirect
 	golang.org/x/arch v0.0.0-20210923205945-b76863e36670 // indirect
-	golang.org/x/net v0.7.0 // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
-	google.golang.org/protobuf v1.28.1 // indirect
+	golang.org/x/net v0.12.0 // indirect
+	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/text v0.11.0 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
