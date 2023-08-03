@@ -55,7 +55,7 @@ func Initialize(cfg *Config) *gin.Engine {
 
 	setGlobalMiddlewares(rg, cfg)
 
-	setOauth2Routes(rg)
+	setOauth2Routes(rg, cfg.UserRepo, cfg.AuthMode, cfg.AccessControl)
 	setAuthRoutes(rg, cfg.UserRepo, cfg.AuthMode)
 	setUserRoutes(rg, cfg.UserRepo, cfg.AccessControl)
 	setHelloRoutes(rg, cfg.AccessControl)
