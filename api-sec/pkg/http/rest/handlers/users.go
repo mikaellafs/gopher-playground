@@ -63,7 +63,7 @@ func DeleteUser(repo user.Repository, ac accesscontrol.AccessControl) func(*gin.
 		// Delete user role
 		ac.RemoveUser(u.Username)
 
-		c.Status(http.StatusOK)
+		c.Status(http.StatusNoContent)
 	}
 }
 

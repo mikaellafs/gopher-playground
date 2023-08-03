@@ -71,7 +71,7 @@ func Refresh(authMode authmode.AuthMode) func(*gin.Context) {
 			return
 		}
 
-		if err != nil {
+		if t != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"token": *t,
 			})
