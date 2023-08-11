@@ -1,20 +1,14 @@
 package chatify
 
-import "encoding/json"
-
-type Message struct {
-	Username string
-	Text     string
+type message interface {
+	GetUsername() string
 }
 
-func (m Message) ToBytes() []byte {
-	data, _ := json.Marshal(m)
-	return data
+type BaseMessage struct {
+	Username string `json:"username"`
+	Text     string `json:"text"`
 }
 
-func NewMessageFrom(data []byte) (Message, error) {
-	var msg Message
-	err := json.Unmarshal(data, &msg)
-
-	return msg, err
+func (m *BaseMessage) GetUsername() string {
+	return m.Username
 }

@@ -2,6 +2,7 @@ package chatify
 
 import (
 	"context"
+	"encoding/json"
 	"gopher-playground/chatify/internal/async"
 	"log"
 	"sync"
@@ -14,16 +15,16 @@ import (
 type Client struct {
 	conn      *websocket.Conn
 	broadcast chan []byte
-	callback  func([]byte) []byte
+	format    func([]byte) (message, error)
 }
 
-func NewClient(conn *websocket.Conn, broadcast chan []byte, callback func([]byte) []byte) *Client {
+func NewClient(conn *websocket.Conn, broadcast chan []byte, format func([]byte) (message, error)) *Client {
 	log.Println("New client connected...")
 
 	return &Client{
 		conn:      conn,
 		broadcast: broadcast,
-		callback:  callback,
+		format:    format,
 	}
 }
 
@@ -50,10 +51,18 @@ func (c *Client) handleIncomingMessage() error {
 	}
 
 	// Manipulate data before broadcasting
-	msg := c.callback(data)
+	msg, err := c.format(data)
+	if err != nil {
+		err = errors.Wrap(err, "failed to manipulate data")
+		log.Println(err.Error())
+		return err
+	}
+
+	// Marshal back to bytes
+	data, _ = json.Marshal(msg)
 
 	// Broadcast message to all clients
-	c.broadcast <- msg
+	c.broadcast <- data
 	return nil
 }
 

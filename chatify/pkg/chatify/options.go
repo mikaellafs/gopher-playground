@@ -2,10 +2,10 @@ package chatify
 
 type ChatServerOption func(server *ChatServer)
 
-// Option to set custom callback function
-func WithMessageCallback(callback func([]byte) []byte) ChatServerOption {
+// Option to set custom format function
+func WithMessageFormat(format func([]byte) (message, error)) ChatServerOption {
 	return func(server *ChatServer) {
-		server.callback = callback
+		server.format = format
 	}
 }
 

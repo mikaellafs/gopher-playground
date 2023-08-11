@@ -1,6 +1,7 @@
 package chatify
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -14,7 +15,7 @@ type ChatServer struct {
 	port      int
 	path      string
 	broadcast chan []byte
-	callback  func([]byte) []byte
+	format    func([]byte) (message, error)
 }
 
 func NewServer(options ...ChatServerOption) *ChatServer {
@@ -23,7 +24,11 @@ func NewServer(options ...ChatServerOption) *ChatServer {
 		port:      8080,  //default
 		path:      "/ws", // default
 		broadcast: make(chan []byte),
-		callback:  func(d []byte) []byte { return d },
+		format: func(d []byte) (message, error) {
+			var msg BaseMessage
+			err := json.Unmarshal(d, &msg)
+			return &msg, err
+		},
 	}
 
 	// Add options to server
@@ -48,7 +53,7 @@ func (s *ChatServer) Run() {
 		defer conn.Close()
 
 		// Create and start new client
-		NewClient(conn, s.broadcast, s.callback).Start()
+		NewClient(conn, s.broadcast, s.format).Start()
 	})
 
 	log.Printf("Chat server started at ws://localhost:%d/%s", s.port, s.path)
