@@ -13,7 +13,8 @@ type ChatServer struct {
 	clients   map[*Client]bool
 	port      int
 	path      string
-	broadcast chan Message
+	broadcast chan []byte
+	callback  func([]byte) []byte
 }
 
 func NewServer(options ...ChatServerOption) *ChatServer {
@@ -21,7 +22,8 @@ func NewServer(options ...ChatServerOption) *ChatServer {
 		clients:   map[*Client]bool{},
 		port:      8080,  //default
 		path:      "/ws", // default
-		broadcast: make(chan Message),
+		broadcast: make(chan []byte),
+		callback:  func(d []byte) []byte { return d },
 	}
 
 	// Add options to server
@@ -46,7 +48,7 @@ func (s *ChatServer) Run() {
 		defer conn.Close()
 
 		// Create and start new client
-		NewClient(conn, s.broadcast).Start()
+		NewClient(conn, s.broadcast, s.callback).Start()
 	})
 
 	log.Printf("Chat server started at ws://localhost:%d/%s", s.port, s.path)
