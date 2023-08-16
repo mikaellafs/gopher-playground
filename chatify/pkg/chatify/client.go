@@ -16,15 +16,17 @@ type Client struct {
 	conn      *websocket.Conn
 	broadcast chan []byte
 	format    func([]byte) (message, error)
+	store     MessageStore
 }
 
-func NewClient(conn *websocket.Conn, broadcast chan []byte, format func([]byte) (message, error)) *Client {
+func NewClient(conn *websocket.Conn, broadcast chan []byte, format func([]byte) (message, error), store MessageStore) *Client {
 	log.Println("New client connected...")
 
 	return &Client{
 		conn:      conn,
 		broadcast: broadcast,
 		format:    format,
+		store:     store,
 	}
 }
 
@@ -56,6 +58,16 @@ func (c *Client) handleIncomingMessage() error {
 		err = errors.Wrap(err, "failed to manipulate data")
 		log.Println(err.Error())
 		return err
+	}
+
+	// Persist message if needed
+	if c.store != nil {
+		err = c.store.SaveMessage(msg)
+		if err != nil {
+			err = errors.Wrap(err, "failed to persist message")
+			log.Println(err.Error())
+			return err
+		}
 	}
 
 	// Marshal back to bytes

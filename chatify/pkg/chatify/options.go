@@ -9,12 +9,12 @@ func WithMessageFormat(format func([]byte) (message, error)) ChatServerOption {
 	}
 }
 
-// // Option to set custom message persistence
-// func WithMessageStore(store MessageStore) ChatServerOption {
-// 	return func(server *ChatServer) {
-// 		server.messageStore = store
-// 	}
-// }
+// Option to set custom message persistence
+func WithMessageStore(store MessageStore) ChatServerOption {
+	return func(server *ChatServer) {
+		server.messageStore = store
+	}
+}
 
 // Option to set custom port
 func WithPort(port int) ChatServerOption {

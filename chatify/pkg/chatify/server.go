@@ -11,11 +11,12 @@ import (
 )
 
 type ChatServer struct {
-	clients   map[*Client]bool
-	port      int
-	path      string
-	broadcast chan []byte
-	format    func([]byte) (message, error)
+	clients      map[*Client]bool
+	port         int
+	path         string
+	broadcast    chan []byte
+	format       func([]byte) (message, error)
+	messageStore MessageStore
 }
 
 func NewServer(options ...ChatServerOption) *ChatServer {
@@ -53,7 +54,7 @@ func (s *ChatServer) Run() {
 		defer conn.Close()
 
 		// Create and start new client
-		NewClient(conn, s.broadcast, s.format).Start()
+		NewClient(conn, s.broadcast, s.format, s.messageStore).Start()
 	})
 
 	log.Printf("Chat server started at ws://localhost:%d/%s", s.port, s.path)

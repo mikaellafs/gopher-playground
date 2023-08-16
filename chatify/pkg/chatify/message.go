@@ -12,3 +12,7 @@ type BaseMessage struct {
 func (m *BaseMessage) GetUsername() string {
 	return m.Username
 }
+
+type MessageStore interface {
+	SaveMessage(message) error
+}
