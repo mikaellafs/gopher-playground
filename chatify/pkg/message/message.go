@@ -1,9 +1,10 @@
-package chatify
+package message
 
-type message interface {
+type Message interface {
 	GetUsername() string
 }
 
+// Implements message interface
 type BaseMessage struct {
 	Username string `json:"username"`
 	Text     string `json:"text"`
@@ -11,8 +12,4 @@ type BaseMessage struct {
 
 func (m *BaseMessage) GetUsername() string {
 	return m.Username
-}
-
-type MessageStore interface {
-	SaveMessage(message) error
 }

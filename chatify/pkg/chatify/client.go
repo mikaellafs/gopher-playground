@@ -3,10 +3,12 @@ package chatify
 import (
 	"context"
 	"encoding/json"
-	"gopher-playground/chatify/internal/async"
 	"log"
 	"sync"
 	"time"
+
+	"gopher-playground/chatify/internal/async"
+	"gopher-playground/chatify/pkg/processor"
 
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
@@ -15,18 +17,16 @@ import (
 type Client struct {
 	conn      *websocket.Conn
 	broadcast chan []byte
-	format    func([]byte) (message, error)
-	store     MessageStore
+	processor *processor.Processor
 }
 
-func NewClient(conn *websocket.Conn, broadcast chan []byte, format func([]byte) (message, error), store MessageStore) *Client {
+func NewClient(conn *websocket.Conn, broadcast chan []byte, processor *processor.Processor) *Client {
 	log.Println("New client connected...")
 
 	return &Client{
 		conn:      conn,
 		broadcast: broadcast,
-		format:    format,
-		store:     store,
+		processor: processor,
 	}
 }
 
@@ -52,26 +52,17 @@ func (c *Client) handleIncomingMessage() error {
 		return err
 	}
 
-	// Manipulate data before broadcasting
-	msg, err := c.format(data)
+	// Process message
+	ctx := processor.NewContext(data)
+	err = c.processor.Start(ctx)
 	if err != nil {
-		err = errors.Wrap(err, "failed to manipulate data")
+		err = errors.Wrap(err, "failed to process message")
 		log.Println(err.Error())
 		return err
 	}
 
-	// Persist message if needed
-	if c.store != nil {
-		err = c.store.SaveMessage(msg)
-		if err != nil {
-			err = errors.Wrap(err, "failed to persist message")
-			log.Println(err.Error())
-			return err
-		}
-	}
-
 	// Marshal back to bytes
-	data, _ = json.Marshal(msg)
+	data, _ = json.Marshal(ctx.ParsedData)
 
 	// Broadcast message to all clients
 	c.broadcast <- data
