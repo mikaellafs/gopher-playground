@@ -8,6 +8,7 @@ import (
 	"gopher-playground/chatify/pkg/processor"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 type ChatServer struct {
@@ -15,6 +16,8 @@ type ChatServer struct {
 	port      int
 	path      string
 	broadcast chan []byte
+
+	onConnect func(conn *websocket.Conn)
 
 	// Message processor handlers
 	format  *processor.Formatter
@@ -28,6 +31,7 @@ func NewServer(options ...ChatServerOption) *ChatServer {
 		port:      8080,  //default
 		path:      "/ws", // default
 		broadcast: make(chan []byte),
+		onConnect: func(conn *websocket.Conn) {},
 		format:    processor.NewDefaultFormatter(),
 	}
 
@@ -54,6 +58,9 @@ func (s *ChatServer) Run() {
 			return
 		}
 		defer conn.Close()
+
+		// On new connection callback
+		s.onConnect(conn)
 
 		// Create and start new client
 		NewClient(conn, s.broadcast, processor).Start()

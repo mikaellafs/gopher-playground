@@ -3,6 +3,8 @@ package chatify
 import (
 	"gopher-playground/chatify/pkg/message"
 	"gopher-playground/chatify/pkg/processor"
+
+	"github.com/gorilla/websocket"
 )
 
 type ChatServerOption func(server *ChatServer)
@@ -37,5 +39,11 @@ func WithPort(port int) ChatServerOption {
 func WithPath(path string) ChatServerOption {
 	return func(server *ChatServer) {
 		server.path = path
+	}
+}
+
+func WithOnConnectionCallback(onConnect func(*websocket.Conn)) ChatServerOption {
+	return func(server *ChatServer) {
+		server.onConnect = onConnect
 	}
 }
