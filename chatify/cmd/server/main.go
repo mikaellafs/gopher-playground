@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gopher-playground/chatify/pkg/chatify"
 	"gopher-playground/chatify/pkg/message"
+	"time"
 )
 
 type TestMessageStore struct {
@@ -18,5 +19,10 @@ func main() {
 	server := chatify.NewServer(
 		chatify.WithMessageStore(&TestMessageStore{}),
 	)
-	server.Run()
+	go server.Run()
+
+	for {
+		<-time.After(15 * time.Second)
+		fmt.Println("Total clients:", server.TotalClients())
+	}
 }

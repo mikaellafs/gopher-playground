@@ -3,6 +3,7 @@ package chatify
 import (
 	"fmt"
 	"log"
+	"sync"
 
 	"gopher-playground/chatify/internal/connection"
 	"gopher-playground/chatify/pkg/processor"
@@ -12,6 +13,7 @@ import (
 )
 
 type ChatServer struct {
+	mutex     *sync.Mutex
 	clients   map[*Client]bool
 	port      int
 	path      string
@@ -27,6 +29,7 @@ type ChatServer struct {
 
 func NewServer(options ...ChatServerOption) *ChatServer {
 	s := &ChatServer{
+		mutex:     &sync.Mutex{},
 		clients:   map[*Client]bool{},
 		port:      8080,  //default
 		path:      "/ws", // default
@@ -41,6 +44,10 @@ func NewServer(options ...ChatServerOption) *ChatServer {
 	}
 
 	return s
+}
+
+func (s *ChatServer) TotalClients() int {
+	return len(s.clients)
 }
 
 func (s *ChatServer) Run() {
@@ -63,9 +70,29 @@ func (s *ChatServer) Run() {
 		s.onConnect(conn)
 
 		// Create and start new client
-		NewClient(conn, s.broadcast, processor).Start()
+		client := s.initClient(conn, processor)
+		defer s.cleanClient(client)
+
+		client.Start()
 	})
 
 	log.Printf("Chat server started at ws://localhost:%d/%s", s.port, s.path)
 	r.Run(fmt.Sprintf(":%d", s.port))
+}
+
+func (s *ChatServer) initClient(conn *websocket.Conn, msgProcessor *processor.Processor) *Client {
+	client := NewClient(conn, s.broadcast, msgProcessor)
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	s.clients[client] = true
+
+	return client
+}
+
+func (s *ChatServer) cleanClient(client *Client) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	delete(s.clients, client)
 }
