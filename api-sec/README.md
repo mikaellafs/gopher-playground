@@ -10,8 +10,6 @@ This project implements various authentication mechanisms in Golang, including B
 
 The authentication method and other relevant information can be specified in the `config/app/local_jwt_config.yaml` file (for JWT) or `config/app/local_basic_config.yaml` file (for Basic Auth). Here's an example configuration for JWT:
 
-Copy code
-
 ```yaml
 server:
   port: 8080
@@ -82,12 +80,16 @@ go run cmd/main.go
 
 ## Contributing
 
-Contributions to the project are welcome!
+Contributions to the project are welcome! Contributions to the project are welcome! If you'd like to contribute, please follow these guidelines:
+
+- Fork this repository and create a new branch for your feature or bug fix.
+- Commit your changes with clear and descriptive commit messages.
+- Submit a pull request detailing your changes and explaining how they enhance the project.
 
 ## License
 
 This project is licensed under the []. For more details, see the LICENSE.md file.
 
-For any questions or issues, feel free to contact us at mikaellaferreira0@gmail.com. Happy coding!
+For any questions or issues, feel free to contact me at mikaellaferreira0@gmail.com. Happy coding!
 
 ----------
