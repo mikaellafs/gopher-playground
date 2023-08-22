@@ -88,6 +88,6 @@ Contributions to the project are welcome!
 
 This project is licensed under the []. For more details, see the LICENSE.md file.
 
-For any questions or issues, feel free to contact us at mikaellaferreira@gmail.com. Happy coding!
+For any questions or issues, feel free to contact us at mikaellaferreira0@gmail.com. Happy coding!
 
 ----------
