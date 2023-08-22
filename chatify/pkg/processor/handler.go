@@ -1,6 +1,10 @@
 package processor
 
-import "gopher-playground/chatify/pkg/message"
+import (
+	"gopher-playground/chatify/pkg/message"
+
+	"github.com/gin-gonic/gin"
+)
 
 type Handler interface {
 	Process(*MContext) error
@@ -9,12 +13,14 @@ type Handler interface {
 }
 
 type MContext struct {
+	ginCtx     *gin.Context
 	RawData    []byte
 	ParsedData message.Message
 }
 
-func NewContext(data []byte) *MContext {
+func NewContext(c *gin.Context, data []byte) *MContext {
 	return &MContext{
+		ginCtx:  c,
 		RawData: data,
 	}
 }

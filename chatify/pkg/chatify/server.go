@@ -19,7 +19,8 @@ type ChatServer struct {
 	path      string
 	broadcast chan []byte
 
-	onConnect func(conn *websocket.Conn)
+	onConnect   func(conn *websocket.Conn)
+	middlewares []gin.HandlerFunc
 
 	// Message processor handlers
 	format  *processor.Formatter
@@ -57,7 +58,7 @@ func (s *ChatServer) Run() {
 	// Create processor
 	processor := processor.InitMsgProcessor(s.format, s.persist, s.customs...)
 
-	r.GET(s.path, func(c *gin.Context) {
+	handlers := append(s.middlewares, func(c *gin.Context) {
 		// Upgrade http connection to websocket one
 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -70,18 +71,20 @@ func (s *ChatServer) Run() {
 		s.onConnect(conn)
 
 		// Create and start new client
-		client := s.initClient(conn, processor)
+		client := s.initClient(c, conn, processor)
 		defer s.cleanClient(client)
 
 		client.Start()
 	})
 
+	r.GET(s.path, handlers...)
+
 	log.Printf("Chat server started at ws://localhost:%d/%s", s.port, s.path)
 	r.Run(fmt.Sprintf(":%d", s.port))
 }
 
-func (s *ChatServer) initClient(conn *websocket.Conn, msgProcessor *processor.Processor) *Client {
-	client := NewClient(conn, s.broadcast, msgProcessor)
+func (s *ChatServer) initClient(c *gin.Context, conn *websocket.Conn, msgProcessor *processor.Processor) *Client {
+	client := NewClient(c, conn, s.broadcast, msgProcessor)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 

@@ -10,20 +10,23 @@ import (
 	"gopher-playground/chatify/internal/async"
 	"gopher-playground/chatify/pkg/processor"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 )
 
 type Client struct {
+	ginCtx    *gin.Context
 	conn      *websocket.Conn
 	broadcast chan []byte
 	processor *processor.Processor
 }
 
-func NewClient(conn *websocket.Conn, broadcast chan []byte, processor *processor.Processor) *Client {
+func NewClient(c *gin.Context, conn *websocket.Conn, broadcast chan []byte, processor *processor.Processor) *Client {
 	log.Println("New client connected...")
 
 	return &Client{
+		ginCtx:    c,
 		conn:      conn,
 		broadcast: broadcast,
 		processor: processor,
@@ -53,7 +56,7 @@ func (c *Client) handleIncomingMessage() error {
 	}
 
 	// Process message
-	ctx := processor.NewContext(data)
+	ctx := processor.NewContext(c.ginCtx, data)
 	err = c.processor.Start(ctx)
 	if err != nil {
 		err = errors.Wrap(err, "failed to process message")

@@ -4,6 +4,7 @@ import (
 	"gopher-playground/chatify/pkg/message"
 	"gopher-playground/chatify/pkg/processor"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
@@ -45,5 +46,11 @@ func WithPath(path string) ChatServerOption {
 func WithOnConnectionCallback(onConnect func(*websocket.Conn)) ChatServerOption {
 	return func(server *ChatServer) {
 		server.onConnect = onConnect
+	}
+}
+
+func WithMiddleware(mid gin.HandlerFunc) ChatServerOption {
+	return func(server *ChatServer) {
+		server.middlewares = append(server.middlewares, mid)
 	}
 }
