@@ -1,15 +1,14 @@
 package message
 
 type Message interface {
-	GetUsername() string
+	GetText() string
 }
 
 // Implements message interface
 type BaseMessage struct {
-	Username string `json:"username"`
-	Text     string `json:"text"`
+	Text string `json:"text"`
 }
 
-func (m *BaseMessage) GetUsername() string {
-	return m.Username
+func (m *BaseMessage) GetText() string {
+	return m.Text
 }

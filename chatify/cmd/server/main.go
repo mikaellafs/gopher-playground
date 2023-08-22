@@ -13,7 +13,7 @@ type TestMessageStore struct {
 }
 
 func (s *TestMessageStore) SaveMessage(m message.Message) error {
-	fmt.Println("Saving message...", m.GetUsername())
+	fmt.Println("Saving message...", m.GetText())
 	return nil
 }
 
