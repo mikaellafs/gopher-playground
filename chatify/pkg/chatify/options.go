@@ -9,23 +9,24 @@ import (
 )
 
 type ChatServerOption func(server *ChatServer)
+type ChatGroupOption func(server *ChatGroup)
 
 // Option to set custom format function
-func WithMessageFormat(format func([]byte) (message.Message, error)) ChatServerOption {
-	return func(server *ChatServer) {
+func WithMessageFormat(format func([]byte) (message.Message, error)) ChatGroupOption {
+	return func(server *ChatGroup) {
 		server.format = processor.NewMessageFormatter(format)
 	}
 }
 
 // Option to set custom message persistence
-func WithMessageStore(store message.Store) ChatServerOption {
-	return func(server *ChatServer) {
+func WithMessageStore(store message.Store) ChatGroupOption {
+	return func(server *ChatGroup) {
 		server.persist = processor.NewMessagePersister(store)
 	}
 }
 
-func WithCustomMessageHandler(handler processor.Handler) ChatServerOption {
-	return func(server *ChatServer) {
+func WithCustomMessageHandler(handler processor.Handler) ChatGroupOption {
+	return func(server *ChatGroup) {
 		server.customs = append(server.customs, handler)
 	}
 }
@@ -37,20 +38,32 @@ func WithPort(port int) ChatServerOption {
 	}
 }
 
-func WithPath(path string) ChatServerOption {
+func WithServerPath(path string) ChatServerOption {
 	return func(server *ChatServer) {
 		server.path = path
 	}
 }
 
-func WithOnConnectionCallback(onConnect func(*websocket.Conn)) ChatServerOption {
-	return func(server *ChatServer) {
+func WithGroupPath(path string) ChatGroupOption {
+	return func(server *ChatGroup) {
+		server.path = path
+	}
+}
+
+func WithOnConnectionCallback(onConnect func(*websocket.Conn)) ChatGroupOption {
+	return func(server *ChatGroup) {
 		server.onConnect = onConnect
 	}
 }
 
-func WithMiddleware(mid gin.HandlerFunc) ChatServerOption {
+func WithServerMiddleware(mid gin.HandlerFunc) ChatServerOption {
 	return func(server *ChatServer) {
+		server.middlewares = append(server.middlewares, mid)
+	}
+}
+
+func WithGroupMiddleware(mid gin.HandlerFunc) ChatGroupOption {
+	return func(server *ChatGroup) {
 		server.middlewares = append(server.middlewares, mid)
 	}
 }

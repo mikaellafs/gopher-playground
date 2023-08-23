@@ -13,14 +13,23 @@ import (
 )
 
 type ChatServer struct {
+	port        int
+	path        string
+	middlewares []gin.HandlerFunc
+	router      *gin.Engine
+
+	groups []*ChatGroup
+}
+
+type ChatGroup struct {
 	mutex     *sync.Mutex
 	clients   map[*Client]bool
-	port      int
 	path      string
 	broadcast chan []byte
 
 	onConnect   func(conn *websocket.Conn)
 	middlewares []gin.HandlerFunc
+	router      *gin.RouterGroup
 
 	// Message processor handlers
 	format  *processor.Formatter
@@ -30,13 +39,9 @@ type ChatServer struct {
 
 func NewServer(options ...ChatServerOption) *ChatServer {
 	s := &ChatServer{
-		mutex:     &sync.Mutex{},
-		clients:   map[*Client]bool{},
-		port:      8080,  //default
-		path:      "/ws", // default
-		broadcast: make(chan []byte),
-		onConnect: func(conn *websocket.Conn) {},
-		format:    processor.NewDefaultFormatter(),
+		port:   8080,  //default
+		path:   "/ws", // default
+		router: gin.Default(),
 	}
 
 	// Add options to server
@@ -47,12 +52,48 @@ func NewServer(options ...ChatServerOption) *ChatServer {
 	return s
 }
 
-func (s *ChatServer) TotalClients() int {
-	return len(s.clients)
+func (s *ChatServer) NewGroup(options ...ChatGroupOption) *ChatGroup {
+	g := &ChatGroup{
+		mutex:     &sync.Mutex{},
+		clients:   map[*Client]bool{},
+		broadcast: make(chan []byte),
+		onConnect: func(conn *websocket.Conn) {},
+		format:    processor.NewDefaultFormatter(),
+		path:      "/chat", // default
+	}
+
+	// Add options to server
+	for _, option := range options {
+		option(g)
+	}
+
+	// Setup router
+	g.router = s.router.Group(s.path + g.path)
+
+	// Append new group
+	s.groups = append(s.groups, g)
+
+	return g
 }
 
 func (s *ChatServer) Run() {
-	r := gin.Default()
+	// Set middleware
+	s.router.Use(s.middlewares...)
+
+	// Setup groups
+	for _, g := range s.groups {
+		g.setup()
+	}
+
+	log.Printf("Chat server started at ws://localhost:%d%s", s.port, s.path)
+	s.router.Run(fmt.Sprintf(":%d", s.port))
+}
+
+func (s *ChatGroup) TotalClients() int {
+	return len(s.clients)
+}
+
+func (s *ChatGroup) setup() {
 	upgrader := connection.NewWSUpgrader()
 
 	// Create processor
@@ -77,13 +118,10 @@ func (s *ChatServer) Run() {
 		client.Start()
 	})
 
-	r.GET(s.path, handlers...)
-
-	log.Printf("Chat server started at ws://localhost:%d/%s", s.port, s.path)
-	r.Run(fmt.Sprintf(":%d", s.port))
+	s.router.GET("", handlers...)
 }
 
-func (s *ChatServer) initClient(c *gin.Context, conn *websocket.Conn, msgProcessor *processor.Processor) *Client {
+func (s *ChatGroup) initClient(c *gin.Context, conn *websocket.Conn, msgProcessor *processor.Processor) *Client {
 	client := NewClient(c, conn, s.broadcast, msgProcessor)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -93,7 +131,7 @@ func (s *ChatServer) initClient(c *gin.Context, conn *websocket.Conn, msgProcess
 	return client
 }
 
-func (s *ChatServer) cleanClient(client *Client) {
+func (s *ChatGroup) cleanClient(client *Client) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 

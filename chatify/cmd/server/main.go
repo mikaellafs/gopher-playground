@@ -19,15 +19,17 @@ func (s *TestMessageStore) SaveMessage(m message.Message) error {
 
 func main() {
 	server := chatify.NewServer(
-		chatify.WithMessageStore(&TestMessageStore{}),
-		chatify.WithMiddleware(func(c *gin.Context) {
+		chatify.WithServerMiddleware(func(c *gin.Context) {
 			fmt.Println("Ihuuu")
 		}),
+	)
+	g := server.NewGroup(
+		chatify.WithMessageStore(&TestMessageStore{}),
 	)
 	go server.Run()
 
 	for {
 		<-time.After(15 * time.Second)
-		fmt.Println("Total clients:", server.TotalClients())
+		fmt.Println("Total clients:", g.TotalClients())
 	}
 }
