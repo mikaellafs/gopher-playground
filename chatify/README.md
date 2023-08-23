@@ -9,6 +9,8 @@ Chatify provides a simple and efficient way to set up a real-time chat system us
 ## Features
 - **Modular Design:** Utilize modular design principles to enable easy expansion and customization of server functionalities;
 
+- **Multiple Chat Rooms:** Create and manage multiple chat groups.
+
 - **On Connection Callbacks:** Trigger custom actions when new clients connect to the server, allowing for dynamic interactions;
 
 - **Middleware Support:** Integrate middleware functions to extend server functionality and enhance the user experience. For instance, it enables to add authentication and access control middlewares.
