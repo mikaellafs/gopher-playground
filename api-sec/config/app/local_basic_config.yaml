@@ -1,0 +1,12 @@
+server:
+  port: 8080
+  rate_limit: 2
+  retry_after: 2
+
+  https:
+    enable: false
+    cert_path: "certs/server/server.crt"
+    key_path: "certs/server/server.key"
+
+auth:
+  mode: "basic" # basic, session_cookies, jwt
