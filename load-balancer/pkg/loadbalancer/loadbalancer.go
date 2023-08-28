@@ -29,6 +29,19 @@ func (l *LoadBalancer) RegisterService(name string, service server.Service, conf
 	return nil
 }
 
-func (l *LoadBalancer) UnregisterService(name string) {
+func (l *LoadBalancer) UnregisterService(name string) error {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
 
+	if l.pools[name] == nil {
+		return ErrServiceNotExists
+	}
+
+	err := l.pools[name].Shutdown()
+	if err != nil {
+		return err
+	}
+
+	l.pools[name] = nil
+	return nil
 }

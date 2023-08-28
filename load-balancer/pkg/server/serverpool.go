@@ -16,3 +16,7 @@ func NewServerPool(service Service, configs ...ConfigOption) *ServerPool {
 
 	return s
 }
+
+func (p *ServerPool) Shutdown() error {
+	return nil
+}
