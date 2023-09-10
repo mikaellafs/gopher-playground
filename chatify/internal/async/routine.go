@@ -24,6 +24,21 @@ func RunEndlessRoutineWithCancel(wg *sync.WaitGroup, ctx context.Context, cancel
 	}
 }
 
+func RunWorker(dataCh chan []byte, wg *sync.WaitGroup, ctx context.Context, cancel context.CancelFunc, work func([]byte) error) {
+	defer wg.Done()
+
+	for {
+		select {
+		case data := <-dataCh:
+			if err := work(data); err != nil {
+				cancel()
+			}
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
 func RunRoutineWithCancel(wg *sync.WaitGroup, ctx context.Context, cancel context.CancelFunc, work func() error) {
 	defer wg.Done()
 

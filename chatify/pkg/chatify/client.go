@@ -16,19 +16,23 @@ import (
 )
 
 type Client struct {
+	Id        string
 	ginCtx    *gin.Context
 	conn      *websocket.Conn
-	broadcast chan []byte
+	broadcast async.Broadcaster
+	msgs      chan []byte
 	processor *processor.Processor
 }
 
-func NewClient(c *gin.Context, conn *websocket.Conn, broadcast chan []byte, processor *processor.Processor) *Client {
+func NewClient(id string, dataChannel chan []byte, c *gin.Context, conn *websocket.Conn, broadcast async.Broadcaster, processor *processor.Processor) *Client {
 	log.Println("New client connected...")
 
 	return &Client{
+		Id:        id,
 		ginCtx:    c,
 		conn:      conn,
 		broadcast: broadcast,
+		msgs:      dataChannel,
 		processor: processor,
 	}
 }
@@ -68,14 +72,14 @@ func (c *Client) handleIncomingMessage() error {
 	data, _ = json.Marshal(ctx.ParsedData)
 
 	// Broadcast message to all clients
-	c.broadcast <- data
+	c.broadcast.Send(data)
 	return nil
 }
 
 // Handle messages that comes from broadcast channel. That is, messages sent by other users
 func (c *Client) handleBroadcastMessages() error {
 	select {
-	case msg := <-c.broadcast:
+	case msg := <-c.msgs:
 		// Send message to client
 		err := c.conn.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {

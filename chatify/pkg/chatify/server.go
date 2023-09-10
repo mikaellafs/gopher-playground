@@ -1,14 +1,17 @@
 package chatify
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sync"
 
+	"gopher-playground/chatify/internal/async"
 	"gopher-playground/chatify/internal/connection"
 	"gopher-playground/chatify/pkg/processor"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -25,7 +28,7 @@ type ChatGroup struct {
 	mutex     *sync.Mutex
 	clients   map[*Client]bool
 	path      string
-	broadcast chan []byte
+	broadcast async.Broadcaster
 
 	onConnect   func(conn *websocket.Conn)
 	middlewares []gin.HandlerFunc
@@ -56,7 +59,7 @@ func (s *ChatServer) NewGroup(options ...ChatGroupOption) *ChatGroup {
 	g := &ChatGroup{
 		mutex:     &sync.Mutex{},
 		clients:   map[*Client]bool{},
-		broadcast: make(chan []byte),
+		broadcast: *async.NewBroadcaster(make(chan []byte)),
 		onConnect: func(conn *websocket.Conn) {},
 		format:    processor.NewDefaultFormatter(),
 		path:      "/chat", // default
@@ -81,23 +84,35 @@ func (s *ChatServer) Run() {
 	s.router.Use(s.middlewares...)
 
 	// Setup groups
+	var wg sync.WaitGroup
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	for _, g := range s.groups {
-		g.setup()
+		wg.Add(1)
+		g.setup(&wg, ctx, cancel)
 	}
 
 	log.Printf("Chat server started at ws://localhost:%d%s", s.port, s.path)
 	s.router.Run(fmt.Sprintf(":%d", s.port))
+
+	// End groups
+	cancel()
+	wg.Wait()
 }
 
 func (s *ChatGroup) TotalClients() int {
 	return len(s.clients)
 }
 
-func (s *ChatGroup) setup() {
+func (s *ChatGroup) setup(wg *sync.WaitGroup, ctx context.Context, cancel context.CancelFunc) {
 	upgrader := connection.NewWSUpgrader()
 
 	// Create processor
 	processor := processor.InitMsgProcessor(s.format, s.persist, s.customs...)
+
+	// Init broadcaster
+	go async.RunWorker(s.broadcast.Receiver, wg, ctx, cancel, s.broadcast.Start)
 
 	handlers := append(s.middlewares, func(c *gin.Context) {
 		// Upgrade http connection to websocket one
@@ -122,7 +137,10 @@ func (s *ChatGroup) setup() {
 }
 
 func (s *ChatGroup) initClient(c *gin.Context, conn *websocket.Conn, msgProcessor *processor.Processor) *Client {
-	client := NewClient(c, conn, s.broadcast, msgProcessor)
+	id := uuid.New().String()
+	dataChannel := s.broadcast.Register(id)
+
+	client := NewClient(id, dataChannel, c, conn, s.broadcast, msgProcessor)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -132,6 +150,8 @@ func (s *ChatGroup) initClient(c *gin.Context, conn *websocket.Conn, msgProcesso
 }
 
 func (s *ChatGroup) cleanClient(client *Client) {
+	s.broadcast.Unregister(client.Id)
+
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
