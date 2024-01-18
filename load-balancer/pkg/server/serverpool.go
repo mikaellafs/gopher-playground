@@ -13,6 +13,12 @@ type ServerPool struct {
 	mutex   *sync.Mutex
 	servers map[string]*Server
 	service Service
+
+	timeout        time.Duration
+	maxConnections int
+	minConnections int
+	minServers     int
+	maxRetries     int
 }
 
 func NewServerPool(service Service, configs ...ConfigOption) *ServerPool {
@@ -20,6 +26,12 @@ func NewServerPool(service Service, configs ...ConfigOption) *ServerPool {
 		mutex:   &sync.Mutex{},
 		servers: map[string]*Server{},
 		service: service,
+
+		timeout:        10 * time.Second,
+		maxConnections: 200,
+		minConnections: 40,
+		minServers:     1,
+		maxRetries:     3,
 	}
 
 	// Apply config options
